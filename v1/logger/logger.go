@@ -3,11 +3,11 @@ package logger
 import (
 	"context"
 	"fmt"
-	"gomicroutils/v1/amqp"
 	"log"
 	"os"
 	"sync"
 
+	"github.com/clicworth-com/gomicroutils/v1/amqp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

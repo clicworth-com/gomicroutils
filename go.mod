@@ -1,4 +1,4 @@
-module gomicroutils
+module github.com/clicworth-com/gomicroutils
 
 go 1.21.1
 
