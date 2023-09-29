@@ -3,7 +3,6 @@ package amqp
 import (
 	"fmt"
 	"log"
-	"os"
 	"sync"
 	"time"
 
@@ -11,11 +10,12 @@ import (
 )
 
 type RabbitAMQPClient struct {
-	conn     *amqp.Connection
-	ch       *amqp.Channel
-	log_ex   string // exchange name for logs
-	trac_ex  string // exchange name for tracker
-	mail_key string // routing key for sending mail
+	Conn           *amqp.Connection
+	Ch             *amqp.Channel
+	LogExName      string // exchange name for logs
+	TracExName     string // exchange name for tracker
+	MailRoutingKey string // routing key for sending mail
+	MailQName      string
 }
 
 var once sync.Once
@@ -35,53 +35,9 @@ func Get() *RabbitAMQPClient {
 			log.Panic("unable to create channel on rabbitmq")
 		}
 
-		lexName := os.Getenv("LOG_EXCHANGE_NAME")
-		if lexName == "" {
-			lexName = "logs_topic"
-		}
-
-		err = ch.ExchangeDeclare(
-			lexName, // name
-			"topic", // type
-			true,    // durable
-			false,   // auto-deleted
-			false,   // internal
-			false,   // no-wait
-			nil,     // arguments
-		)
-		if err != nil {
-			log.Panic("unable to declare exchange for logs topic")
-		}
-
-		texName := os.Getenv("TRACKER_EXCHANGE_NAME")
-		if texName == "" {
-			texName = "tracker_topic"
-		}
-
-		err = ch.ExchangeDeclare(
-			texName, // name
-			"topic", // type
-			true,    // durable
-			false,   // auto-deleted
-			false,   // internal
-			false,   // no-wait
-			nil,     // arguments
-		)
-		if err != nil {
-			log.Panic("unable to declare exchange for tracker topic")
-		}
-
-		mailKey := os.Getenv("MAIL_ROUTING_KEY")
-		if mailKey == "" {
-			mailKey = "mail_queue"
-		}
-
 		amqpClient = &RabbitAMQPClient{
-			conn:     conn,
-			ch:       ch,
-			log_ex:   lexName,
-			trac_ex:  texName,
-			mail_key: mailKey,
+			Conn: conn,
+			Ch:   ch,
 		}
 	})
 	return amqpClient
@@ -118,10 +74,10 @@ func connectRabbit() (*amqp.Connection, error) {
 }
 
 func (a *RabbitAMQPClient) Stop() {
-	if a.ch != nil {
-		a.ch.Close()
+	if a.Ch != nil {
+		a.Ch.Close()
 	}
-	if a.conn != nil {
-		a.conn.Close()
+	if a.Conn != nil {
+		a.Conn.Close()
 	}
 }

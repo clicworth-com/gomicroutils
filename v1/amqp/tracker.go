@@ -3,6 +3,10 @@ package amqp
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"log"
+	"os"
+	"sync"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -15,7 +19,35 @@ type TrackEvent struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+var createtracex sync.Once
+
 func (a *RabbitAMQPClient) TrackEvent(e []byte, sender, name string) error {
+
+	createtracex.Do(func() {
+		texName := os.Getenv("TRACKER_EXCHANGE_NAME")
+		if texName == "" {
+			texName = "tracker_topic"
+		}
+
+		err := a.Ch.ExchangeDeclare(
+			texName, // name
+			"topic", // type
+			true,    // durable
+			false,   // auto-deleted
+			false,   // internal
+			false,   // no-wait
+			nil,     // arguments
+		)
+		if err != nil {
+			log.Panic("unable to declare exchange for tracker topic")
+		}
+		a.TracExName = texName
+	})
+
+	if a.TracExName == "" {
+		return errors.New("unable to create tracker exchange")
+	}
+
 	evt := TrackEvent{
 		Sender:    sender,
 		EventName: name,
@@ -27,11 +59,11 @@ func (a *RabbitAMQPClient) TrackEvent(e []byte, sender, name string) error {
 	if err != nil {
 		return err
 	}
-	return a.track(evtB, a.trac_ex)
+	return a.track(evtB, a.TracExName)
 }
 
 func (a *RabbitAMQPClient) track(p []byte, ex string) error {
-	err := a.ch.PublishWithContext(context.Background(),
+	err := a.Ch.PublishWithContext(context.Background(),
 		ex,    // exchange
 		"",    // routing key
 		false, // mandatory

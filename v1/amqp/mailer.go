@@ -2,9 +2,11 @@ package amqp
 
 import (
 	"context"
+	"errors"
 	"log"
 	"math/rand"
 	"os"
+	"sync"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -26,34 +28,44 @@ type MailResponse struct {
 	Message string `json:"message"`
 }
 
+var createmailq sync.Once
+
 func (r *RabbitAMQPClient) SendMail(msg []byte) error {
 
-	qname := os.Getenv("MAIL_QUEUE_NAME")
-	if qname == "" {
-		qname = "mail_queue"
+	createmailq.Do(func() {
+
+		rkname := os.Getenv("MAIL_ROUTING_KEY_NAME")
+		if rkname == "" {
+			rkname = "mail_queue"
+		}
+
+		q, err := r.Ch.QueueDeclare(
+			"",    // name
+			false, // durable
+			true,  // delete when unused
+			true,  // exclusive
+			false, // noWait
+			nil,   // arguments
+		)
+		if err != nil {
+			log.Println("Unable to create mail queue ", err)
+		}
+		r.MailRoutingKey = rkname
+		r.MailQName = q.Name
+	})
+
+	if r.MailQName == "" {
+		return errors.New("unable to create mail queue")
 	}
 
-	q, err := r.ch.QueueDeclare(
-		"",    // name
-		false, // durable
-		true,  // delete when unused
-		true,  // exclusive
-		false, // noWait
-		nil,   // arguments
-	)
-	if err != nil {
-		log.Println("Unable to create mail queue ", err)
-		return err
-	}
-
-	msgs, err := r.ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+	msgs, err := r.Ch.Consume(
+		r.MailQName, // queue
+		"",          // consumer
+		true,        // auto-ack
+		false,       // exclusive
+		false,       // no-local
+		false,       // no-wait
+		nil,         // args
 	)
 	if err != nil {
 		log.Println("Failed to register a consumer ", err)
@@ -67,15 +79,15 @@ func (r *RabbitAMQPClient) SendMail(msg []byte) error {
 
 	log.Println("sending mail request with corrrId: " + corrId)
 
-	err = r.ch.PublishWithContext(ctx,
-		"",    // exchange
-		qname, // routing key
-		false, // mandatory
-		false, // immediate
+	err = r.Ch.PublishWithContext(ctx,
+		"",               // exchange
+		r.MailRoutingKey, // routing key
+		false,            // mandatory
+		false,            // immediate
 		amqp.Publishing{
 			ContentType:   "application/json",
 			CorrelationId: corrId,
-			ReplyTo:       q.Name,
+			ReplyTo:       r.MailQName,
 			Body:          msg,
 		})
 	if err != nil {
