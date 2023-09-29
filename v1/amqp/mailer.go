@@ -34,9 +34,9 @@ func (r *RabbitAMQPClient) SendMail(msg []byte) error {
 
 	createmailq.Do(func() {
 
-		rkname := os.Getenv("MAIL_ROUTING_KEY_NAME")
-		if rkname == "" {
-			rkname = "mail_queue"
+		rqname := os.Getenv("MAIL_QUEUE_NAME")
+		if rqname == "" {
+			rqname = "mail_queue"
 		}
 
 		q, err := r.Ch.QueueDeclare(
@@ -50,22 +50,22 @@ func (r *RabbitAMQPClient) SendMail(msg []byte) error {
 		if err != nil {
 			log.Println("Unable to create mail queue ", err)
 		}
-		r.MailRoutingKey = rkname
-		r.MailQName = q.Name
+		r.MailReqQName = rqname
+		r.MailResQName = q.Name
 	})
 
-	if r.MailQName == "" {
+	if r.MailReqQName == "" {
 		return errors.New("unable to create mail queue")
 	}
 
 	msgs, err := r.Ch.Consume(
-		r.MailQName, // queue
-		"",          // consumer
-		true,        // auto-ack
-		false,       // exclusive
-		false,       // no-local
-		false,       // no-wait
-		nil,         // args
+		r.MailResQName, // queue
+		"",             // consumer
+		true,           // auto-ack
+		false,          // exclusive
+		false,          // no-local
+		false,          // no-wait
+		nil,            // args
 	)
 	if err != nil {
 		log.Println("Failed to register a consumer ", err)
@@ -80,14 +80,14 @@ func (r *RabbitAMQPClient) SendMail(msg []byte) error {
 	log.Println("sending mail request with corrrId: " + corrId)
 
 	err = r.Ch.PublishWithContext(ctx,
-		"",               // exchange
-		r.MailRoutingKey, // routing key
-		false,            // mandatory
-		false,            // immediate
+		"",             // exchange
+		r.MailReqQName, // routing key
+		false,          // mandatory
+		false,          // immediate
 		amqp.Publishing{
 			ContentType:   "application/json",
 			CorrelationId: corrId,
-			ReplyTo:       r.MailQName,
+			ReplyTo:       r.MailResQName,
 			Body:          msg,
 		})
 	if err != nil {
