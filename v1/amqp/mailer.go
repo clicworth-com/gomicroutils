@@ -2,6 +2,7 @@ package amqp
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"math/rand"
@@ -24,13 +25,14 @@ type MailRequest struct {
 }
 
 type MailResponse struct {
-	Status  bool   `json:"status"`
-	Message string `json:"message"`
+	Status        bool   `json:"status"`
+	Message       string `json:"message"`
+	CorrelationId string `json:"correlation_id"`
 }
 
 var createmailq sync.Once
 
-func (r *RabbitAMQPClient) SendMail(msg []byte) error {
+func (r *RabbitAMQPClient) SendMail(msg []byte, cb func(MailResponse)) (string, error) {
 
 	createmailq.Do(func() {
 
@@ -55,7 +57,7 @@ func (r *RabbitAMQPClient) SendMail(msg []byte) error {
 	})
 
 	if r.MailReqQName == "" {
-		return errors.New("unable to create mail queue")
+		return "", errors.New("unable to create mail queue")
 	}
 
 	msgs, err := r.Ch.Consume(
@@ -69,7 +71,7 @@ func (r *RabbitAMQPClient) SendMail(msg []byte) error {
 	)
 	if err != nil {
 		log.Println("Failed to register a consumer ", err)
-		return err
+		return "", err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -92,17 +94,26 @@ func (r *RabbitAMQPClient) SendMail(msg []byte) error {
 		})
 	if err != nil {
 		log.Println("Failed to publish a message")
-		return err
+		return "", err
 	}
 
-	for d := range msgs {
-		if corrId == d.CorrelationId {
-			log.Println("Mail response for corrrId: " + corrId + " " + string(d.Body))
-			break
+	go func() {
+		for d := range msgs {
+			if corrId == d.CorrelationId {
+				log.Println("Mail response for corrrId: " + corrId + " " + string(d.Body))
+				if cb != nil {
+					var res MailResponse
+					if err := json.Unmarshal(d.Body, &res); err != nil {
+						log.Println("unble to invoke mail response callback function")
+					}
+					cb(res)
+				}
+				break
+			}
 		}
-	}
+	}()
 
-	return nil
+	return corrId, nil
 
 }
 
