@@ -99,8 +99,8 @@ func (r *RabbitAMQPClient) SendMail(msg []byte, cb func(MailResponse)) (string, 
 
 	go func() {
 		for d := range msgs {
+			time.Sleep(2 * time.Second)
 			if corrId == d.CorrelationId {
-				log.Println("Mail response for corrrId: " + corrId + " " + string(d.Body))
 				if cb != nil {
 					var res MailResponse
 					if err := json.Unmarshal(d.Body, &res); err != nil {
