@@ -79,8 +79,6 @@ func (r *RabbitAMQPClient) SendMail(msg []byte, cb func(MailResponse)) (string, 
 
 	corrId := randomString(32)
 
-	log.Println("sending mail request with corrrId: " + corrId)
-
 	err = r.Ch.PublishWithContext(ctx,
 		"",             // exchange
 		r.MailReqQName, // routing key
@@ -99,7 +97,6 @@ func (r *RabbitAMQPClient) SendMail(msg []byte, cb func(MailResponse)) (string, 
 
 	go func() {
 		for d := range msgs {
-			time.Sleep(2 * time.Second)
 			if corrId == d.CorrelationId {
 				if cb != nil {
 					var res MailResponse
