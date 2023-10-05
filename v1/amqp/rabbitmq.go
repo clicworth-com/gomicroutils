@@ -16,6 +16,8 @@ type RabbitAMQPClient struct {
 	TracExName   string // exchange name for tracker
 	MailReqQName string // routing key for sending mail
 	MailResQName string
+	SMSReqQName  string // routing key for sending mail
+	SMSResQName  string
 }
 
 var once sync.Once
