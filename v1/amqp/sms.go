@@ -15,6 +15,7 @@ import (
 type SMSRequest struct {
 	From         string `json:"from"`
 	To           string `json:"to"`
+	CountryCode  string `json:"country_code"`
 	Subject      string `json:"subject"`
 	Message      string `json:"message"`
 	MessageType  string `json:"message_type"`
