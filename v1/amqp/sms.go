@@ -13,15 +13,15 @@ import (
 )
 
 type SMSRequest struct {
-	From         string `json:"from"`
-	To           string `json:"to"`
-	CountryCode  string `json:"country_code"`
-	Subject      string `json:"subject"`
-	Message      string `json:"message"`
-	MessageType  string `json:"message_type"`
-	TemplateName string `json:"template_name"`
-	AckRequired  bool   `json:"ack_required"`
-	Priority     string `json:"priority"`
+	From         string         `json:"from"`
+	To           string         `json:"to"`
+	CountryCode  string         `json:"country_code"`
+	Name         string         `json:"name"`
+	Subject      string         `json:"subject"`
+	DataMap      map[string]any `json:"data_map"`
+	TemplateName string         `json:"template_name"`
+	AckRequired  bool           `json:"ack_required"`
+	Priority     string         `json:"priority"`
 }
 
 type SMSResponse struct {
