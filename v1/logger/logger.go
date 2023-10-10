@@ -44,6 +44,7 @@ func Get() *zap.Logger {
 		productionCfg.TimeKey = "timestamp"
 		productionCfg.EncodeTime = zapcore.ISO8601TimeEncoder
 		productionCfg.CallerKey = "caller"
+		productionCfg.EncodeCaller = zapcore.FullCallerEncoder
 
 		developmentCfg := zap.NewDevelopmentEncoderConfig()
 		developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
