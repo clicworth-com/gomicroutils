@@ -8,12 +8,15 @@ enum SearchType {
     SEARCH_TYPE_UNSPECIFIED = 0;
     SEARCH_TYPE_PROJECT = 1;
     SEARCH_TYPE_LOCALITY = 2;
+    SEARCH_TYPE_DEVELOPER = 3;
+    SEARCH_TYPE_PINCODE = 4;
+    SEARCH_TYPE_RERAID = 5;
 }
 
-enum SearchResultType {
-    SEARCH_RESULT_TYPE_UNSPECIFIED = 0;
-    SEARCH_RESULT_TYPE_CLICBRICS = 1;
-    SEARCH_RESULT_TYPE_GOOGLE = 2;
+enum SearchResultSource {
+    SEARCH_RESULT_SOURCE_UNSPECIFIED = 0;
+    SEARCH_RESULT_SOURCE_CLICBRICS = 1;
+    SEARCH_RESULT_SOURCE_GOOGLE = 2;
 }
 
 message SearchRequest {
@@ -31,7 +34,7 @@ message SearchResponse {
     string id = 1;
     string name = 2;
     string address = 3;
-    SearchResultType resultType = 4;
+    SearchResultSource resultSource = 4;
   }
   repeated Result results = 2;
 }
