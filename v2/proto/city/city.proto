@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package city;
+
+import "proto/city/type/search.proto";
+
+option go_package = "genproto/city";
+
+service CityService {
+    rpc Search(SearchRequest) returns (SearchResponse) {}
+}

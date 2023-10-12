@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package auth;
+
+import "proto/auth/type/verify.proto";
+
+option go_package = "genproto/auth";
+
+service AuthService {
+    rpc Verify(VerifyRequest) returns (VerifyResponse) {}
+}
