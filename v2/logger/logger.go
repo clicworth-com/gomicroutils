@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/clicworth-com/gomicroutils/v1/amqp"
+	"github.com/clicworth-com/gomicroutils/v2/amqp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
