@@ -116,36 +116,93 @@ func WithCtx(ctx context.Context, l *CBLogger) context.Context {
 func (c *CBLogger) Info(msg string, fields ...zap.Field) {
 
 	pc, file, line, ok := runtime.Caller(1)
-	tokens := strings.Split(file, "/")
-	filename := tokens[len(tokens)-1]
-	funcname := ""
 	if ok {
-		funcname = runtime.FuncForPC(pc).Name()
+		filetok := strings.Split(file, "/")
+		filename := filetok[len(filetok)-1]
+		function := runtime.FuncForPC(pc).Name()
+		functok := strings.Split(function, ".")
+		funcname := functok[len(functok)-1]
+		caller := filename + "->" + funcname + ":" + fmt.Sprint(line)
+		fields = append(fields, zap.String("caller", caller))
 	}
+	c.logger.Info(msg, fields...)
+}
 
-	c.logger.Info(msg, zap.String("file_name", filename), zap.String("func_name", funcname), zap.String("line", fmt.Sprint(line)))
+func (c *CBLogger) Debug(msg string, fields ...zap.Field) {
+
+	pc, file, line, ok := runtime.Caller(1)
+	if ok {
+		filetok := strings.Split(file, "/")
+		filename := filetok[len(filetok)-1]
+		function := runtime.FuncForPC(pc).Name()
+		functok := strings.Split(function, ".")
+		funcname := functok[len(functok)-1]
+		caller := filename + "->" + funcname + ":" + fmt.Sprint(line)
+		fields = append(fields, zap.String("caller", caller))
+	}
+	c.logger.Debug(msg, fields...)
 
 }
 
 func (c *CBLogger) Warn(msg string, fields ...zap.Field) {
 
+	pc, file, line, ok := runtime.Caller(1)
+	if ok {
+		filetok := strings.Split(file, "/")
+		filename := filetok[len(filetok)-1]
+		function := runtime.FuncForPC(pc).Name()
+		functok := strings.Split(function, ".")
+		funcname := functok[len(functok)-1]
+		caller := filename + "->" + funcname + ":" + fmt.Sprint(line)
+		fields = append(fields, zap.String("caller", caller))
+	}
 	c.logger.Warn(msg, fields...)
 
 }
 
 func (c *CBLogger) Error(msg string, fields ...zap.Field) {
+	pc, file, line, ok := runtime.Caller(1)
+	if ok {
+		filetok := strings.Split(file, "/")
+		filename := filetok[len(filetok)-1]
+		function := runtime.FuncForPC(pc).Name()
+		functok := strings.Split(function, ".")
+		funcname := functok[len(functok)-1]
+		caller := filename + "->" + funcname + ":" + fmt.Sprint(line)
+		fields = append(fields, zap.String("caller", caller))
+	}
 
 	c.logger.Error(msg, fields...)
 
 }
 
 func (c *CBLogger) Panic(msg string, fields ...zap.Field) {
+	pc, file, line, ok := runtime.Caller(1)
+	if ok {
+		filetok := strings.Split(file, "/")
+		filename := filetok[len(filetok)-1]
+		function := runtime.FuncForPC(pc).Name()
+		functok := strings.Split(function, ".")
+		funcname := functok[len(functok)-1]
+		caller := filename + "->" + funcname + ":" + fmt.Sprint(line)
+		fields = append(fields, zap.String("caller", caller))
+	}
 
 	c.logger.Panic(msg, fields...)
 
 }
 
 func (c *CBLogger) Fatal(msg string, fields ...zap.Field) {
+	pc, file, line, ok := runtime.Caller(1)
+	if ok {
+		filetok := strings.Split(file, "/")
+		filename := filetok[len(filetok)-1]
+		function := runtime.FuncForPC(pc).Name()
+		functok := strings.Split(function, ".")
+		funcname := functok[len(functok)-1]
+		caller := filename + "->" + funcname + ":" + fmt.Sprint(line)
+		fields = append(fields, zap.String("caller", caller))
+	}
 
 	c.logger.Fatal(msg, fields...)
 
