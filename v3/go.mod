@@ -3,7 +3,6 @@ module github.com/clicworth-com/gomicroutils/v3
 go 1.21.1
 
 require (
-	github.com/clicworth-com/gomicroutils/v2 v2.0.1
 	github.com/rabbitmq/amqp091-go v1.9.0
 	go.uber.org/zap v1.26.0
 	google.golang.org/grpc v1.58.3
