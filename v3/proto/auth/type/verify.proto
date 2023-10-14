@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "genproto/auth";
+
+message VerifyRequest {
+  string token = 1;
+  string routeName = 2;
+}
+
+message VerifyResponse {
+  bool isAuthorised = 1;
+  string message = 2;
+  string userName = 3;
+  string emailId = 4;
+  string phoneNumber = 5;
+  string role = 6;
+}

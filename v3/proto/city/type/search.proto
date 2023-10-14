@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package city;
+
+option go_package = "genproto/city";
+
+enum SearchType {
+    SEARCH_TYPE_UNSPECIFIED = 0;
+    SEARCH_TYPE_PROJECT = 1;
+    SEARCH_TYPE_LOCALITY = 2;
+    SEARCH_TYPE_DEVELOPER = 3;
+    SEARCH_TYPE_PINCODE = 4;
+    SEARCH_TYPE_RERAID = 5;
+}
+
+enum SearchResultSource {
+    SEARCH_RESULT_SOURCE_UNSPECIFIED = 0;
+    SEARCH_RESULT_SOURCE_CLICBRICS = 1;
+    SEARCH_RESULT_SOURCE_GOOGLE = 2;
+}
+
+message SearchRequest {
+  string input = 1;
+  string city = 2;
+  SearchType type = 3;
+  int32 maxResults = 4;
+}
+
+message SearchResponse {
+  
+  SearchType type = 1;
+
+  message Result {
+    string id = 1;
+    string name = 2;
+    string address = 3;
+    SearchResultSource resultSource = 4;
+  }
+  repeated Result results = 2;
+}
