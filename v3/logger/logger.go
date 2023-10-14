@@ -24,6 +24,8 @@ type CBLogger struct {
 
 var cblog *CBLogger
 
+const FUNCTION_SKIP_LEVEL = 1
+
 // Get initializes a zap.Logger instance if it has not been initialized
 // already and returns the same instance for subsequent calls.
 func Get() *CBLogger {
@@ -115,7 +117,7 @@ func WithCtx(ctx context.Context, l *CBLogger) context.Context {
 
 func (c *CBLogger) Info(msg string, fields ...zap.Field) {
 
-	pc, file, line, ok := runtime.Caller(1)
+	pc, file, line, ok := runtime.Caller(FUNCTION_SKIP_LEVEL)
 	if ok {
 		filetok := strings.Split(file, "/")
 		filename := filetok[len(filetok)-1]
@@ -130,7 +132,7 @@ func (c *CBLogger) Info(msg string, fields ...zap.Field) {
 
 func (c *CBLogger) Debug(msg string, fields ...zap.Field) {
 
-	pc, file, line, ok := runtime.Caller(1)
+	pc, file, line, ok := runtime.Caller(FUNCTION_SKIP_LEVEL)
 	if ok {
 		filetok := strings.Split(file, "/")
 		filename := filetok[len(filetok)-1]
@@ -146,7 +148,7 @@ func (c *CBLogger) Debug(msg string, fields ...zap.Field) {
 
 func (c *CBLogger) Warn(msg string, fields ...zap.Field) {
 
-	pc, file, line, ok := runtime.Caller(1)
+	pc, file, line, ok := runtime.Caller(FUNCTION_SKIP_LEVEL)
 	if ok {
 		filetok := strings.Split(file, "/")
 		filename := filetok[len(filetok)-1]
@@ -161,7 +163,7 @@ func (c *CBLogger) Warn(msg string, fields ...zap.Field) {
 }
 
 func (c *CBLogger) Error(msg string, fields ...zap.Field) {
-	pc, file, line, ok := runtime.Caller(1)
+	pc, file, line, ok := runtime.Caller(FUNCTION_SKIP_LEVEL)
 	if ok {
 		filetok := strings.Split(file, "/")
 		filename := filetok[len(filetok)-1]
@@ -177,7 +179,7 @@ func (c *CBLogger) Error(msg string, fields ...zap.Field) {
 }
 
 func (c *CBLogger) Panic(msg string, fields ...zap.Field) {
-	pc, file, line, ok := runtime.Caller(1)
+	pc, file, line, ok := runtime.Caller(FUNCTION_SKIP_LEVEL)
 	if ok {
 		filetok := strings.Split(file, "/")
 		filename := filetok[len(filetok)-1]
@@ -193,7 +195,7 @@ func (c *CBLogger) Panic(msg string, fields ...zap.Field) {
 }
 
 func (c *CBLogger) Fatal(msg string, fields ...zap.Field) {
-	pc, file, line, ok := runtime.Caller(1)
+	pc, file, line, ok := runtime.Caller(FUNCTION_SKIP_LEVEL)
 	if ok {
 		filetok := strings.Split(file, "/")
 		filename := filetok[len(filetok)-1]
