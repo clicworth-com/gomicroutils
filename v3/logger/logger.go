@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/clicworth-com/gomicroutils/v2/amqp"
+	"github.com/clicworth-com/gomicroutils/v3/amqp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
