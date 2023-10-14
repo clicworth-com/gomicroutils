@@ -79,7 +79,10 @@ func Get() *CBLogger {
 				),
 		)
 
-		cblog.logger = zap.New(core)
+		logger := zap.New(core)
+		cblog = &CBLogger{
+			logger: logger,
+		}
 	})
 
 	return cblog
@@ -112,7 +115,7 @@ func WithCtx(ctx context.Context, l *CBLogger) context.Context {
 
 func (c *CBLogger) Info(msg string, fields ...zap.Field) {
 
-	pc, file, line, ok := runtime.Caller(0)
+	pc, file, line, ok := runtime.Caller(1)
 	tokens := strings.Split(file, "/")
 	filename := tokens[len(tokens)-1]
 	funcname := ""
