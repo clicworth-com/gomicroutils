@@ -115,6 +115,12 @@ func WithCtx(ctx context.Context, l *CBLogger) context.Context {
 	return context.WithValue(ctx, ctxKey{}, l)
 }
 
+// WithCtx returns a copy of ctx with the Logger attached.
+func (l *CBLogger) With(f zapcore.Field) *CBLogger {
+	nl := l.logger.With(f)
+	return &CBLogger{nl}
+}
+
 func (c *CBLogger) Info(msg string, fields ...zap.Field) {
 
 	pc, file, line, ok := runtime.Caller(FUNCTION_SKIP_LEVEL)
